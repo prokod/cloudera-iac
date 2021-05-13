@@ -1,0 +1,7 @@
+name: "@condaEnvName@"
+channels:
+  - defaults
+dependencies:
+  - python=3.8
+  - ansible=2.9
+prefix: ./envs

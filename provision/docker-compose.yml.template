@@ -1,0 +1,32 @@
+version: '3.7'
+services:
+  ansible:
+    image: ansible
+    container_name: ansible-container
+    networks:
+      static-network:
+        ipv4_address: 172.20.0.1
+  host01:
+    image: 'registry.redhat.io/rhel7:{{registry.redhat.io:rhel7}}'
+    container_name: ansible-container
+    networks:
+      static-network:
+        ipv4_address: 172.20.0.2
+  host02:
+    image: 'registry.redhat.io/rhel7:{{registry.redhat.io:rhel7}}'
+    container_name: ansible-container
+    networks:
+      static-network:
+        ipv4_address: 172.20.0.3
+  host03:
+    image: 'registry.redhat.io/rhel7:{{registry.redhat.io:rhel7}}'
+    container_name: ansible-container
+    networks:
+      static-network:
+        ipv4_address: 172.20.0.4
+
+networks:
+  static-network:
+    ipam:
+      config:
+        - subnet: 172.20.0.0/25

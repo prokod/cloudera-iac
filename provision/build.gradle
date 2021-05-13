@@ -1,0 +1,19 @@
+apply plugin: 'com.palantir.docker-compose'
+
+dependencies {
+    docker 'registry.redhat.io:rhel7:7.9'
+}
+
+dockerCompose {
+    dockerComposeFile 'build/docker-compose.yml'
+}
+
+
+task generateDockerComposeFile(type: Copy) {
+    from './'
+    include 'docker-compose.yml.template'
+    filter(ReplaceTokens, tokens: [volume : "${buildDir}:/tmp/conda/out".toString(),
+                                   dockerImageName : dockerImageName('noamasor')])
+    rename ~/(.*).template/, '$1'
+    into 'build'
+}

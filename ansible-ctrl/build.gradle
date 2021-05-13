@@ -1,0 +1,56 @@
+// group = 'com.github.prokod'
+// version = '0.0.1'
+
+apply plugin: 'com.palantir.docker'
+
+def findEnv(String defaultEnv) {
+    findProperty('env') ?: defaultEnv
+}
+
+def findEnv() {
+    findEnv('noenv')
+}
+
+import org.apache.tools.ant.filters.ReplaceTokens
+
+def condaEnvName() {
+    "${project.getName()}-${findEnv()}".toString()
+}
+
+def dockerImageName(def prefix) {
+    "${prefix == null ? '' : prefix + '/'}${condaEnvName()}-builder:${project.getVersion()}".toString()
+}
+
+def dockerContainerName() {
+    "${condaEnvName()}-builder-container".toString()
+}
+
+tasks.docker.dependsOn project(':ansible-conda-pack').tasks.condaPack
+
+docker {
+    def dependenciesDir = 'image-dependencies'
+
+    name "${dockerImageName('noamasor')}"
+    // Files to be used while building image bu Dockerfile
+    copySpec.with {
+        from project(':ansible-conda-pack').tasks.condaPack.outputs.files.singleFile
+        into dependenciesDir
+        
+        from('src') {
+            filter(ReplaceTokens, tokens: [PROXY_USER : findProperty('artifactoryUser') ?: 'user',
+                                           PROXY_PASS : findProperty('artifactoryPass') ?: 'pass',
+                                           condaEnvName : condaEnvName()])
+            into dependenciesDir
+        }
+    }
+
+    buildArgs([DEPENDENCIES_DIR: "$dependenciesDir",
+               BUILD_DIR    : '/tmp/conda',
+               CONDA_ENV_NAME : condaEnvName(),
+               VERSION : project.getVersion(),
+               PROXY_USER : findProperty('artifactoryUser') ?: 'user',
+               PROXY_PASS : findProperty('artifactoryPass') ?: 'pass'
+    ])
+
+    noCache true
+}
