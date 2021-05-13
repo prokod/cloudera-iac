@@ -2,6 +2,7 @@ apply plugin: 'com.palantir.docker-compose'
 
 dependencies {
     docker 'registry.redhat.io:rhel7:7.9'
+    docker 'noamasor:ansible-ctrl-noenv-builder:0.0.1'
 }
 
 dockerCompose {

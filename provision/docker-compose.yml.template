@@ -1,7 +1,7 @@
 version: '3.7'
 services:
   ansible:
-    image: ansible
+    image: noamasor/ansible-ctrl-noenv-builder:{{noamasor:ansible-ctrl-noenv-builder}}
     container_name: ansible-container
     networks:
       static-network:

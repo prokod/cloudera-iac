@@ -1,6 +1,3 @@
-// group = 'com.github.prokod'
-// version = '0.0.1'
-
 apply plugin: 'com.palantir.docker'
 
 def findEnv(String defaultEnv) {
@@ -13,8 +10,8 @@ def findEnv() {
 
 import org.apache.tools.ant.filters.ReplaceTokens
 
-def condaEnvName() {
-    "${project.getName()}-${findEnv()}".toString()
+def condaEnvName(prjName = project.getName(), env = findEnv()) {
+    "${prjName}-${env}".toString()
 }
 
 def dockerImageName(def prefix) {
@@ -35,11 +32,11 @@ docker {
     name "${dockerImageName('noamasor')}"
     // Files to be used while building image bu Dockerfile
     copySpec.with {
-        from('src') {
+        into dependenciesDir
+        from('src/main/resources') {
             filter(ReplaceTokens, tokens: [PROXY_USER : findProperty('artifactoryUser') ?: 'user',
                                            PROXY_PASS : findProperty('artifactoryPass') ?: 'pass',
                                            condaEnvName : condaEnvName()])
-            into dependenciesDir
         }
     }
 
@@ -55,8 +52,8 @@ docker {
 }
 
 project.pluginManager.withPlugin('com.palantir.docker-run') {
-    if (!file(project.buildDir).exists()) {
-        mkdir project.buildDir
+    if (!file(layout.buildDirectory.dir("dist")).exists()) {
+        mkdir layout.buildDirectory.dir("dist")
     }
 }
 
@@ -65,7 +62,7 @@ apply plugin: 'com.palantir.docker-run'
 dockerRun {
     name "${dockerContainerName()}"
     image "${dockerImageName('noamasor')}"
-    volumes "${buildDir}": '/tmp/conda/out'
+    volumes "${buildDir}/dist": '/tmp/conda/out'
     daemonize false
     //command 'sleep', '100'
     // plugin v0.26.0 arguments feature has bug
@@ -73,8 +70,18 @@ dockerRun {
     env 'IMG_VERSION': "${project.version}"
 }
 
-def condaPack = tasks.register('condaPack') {
-    dependsOn 'dockerRun'
+// def condaPack = tasks.register('condaPack') {
+//     dependsOn 'dockerRun'
+//     inputs.dir('src/main/resources')
+//     inputs.file('Dockerfile')
+//     outputs.dir("${buildDir}/${condaEnvName()}-${project.version}.tar.gz")
+// }
 
-    outputs.file("${buildDir}/${condaEnvName()}-${project.version}.tar.gz")
+tasks.dockerRun.configure {
+    // onlyIf {
+    //     !file("${buildDir}/dist/${condaEnvName()}-${project.version}.tar.gz").exists() }
+
+    inputs.dir('src/main/resources')
+    inputs.file('Dockerfile')
+    outputs.dir("${buildDir}/dist")
 }
