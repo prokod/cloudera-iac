@@ -49,3 +49,8 @@ docker {
 
     noCache true
 }
+
+tasks.docker.configure {
+    inputs.dir('src/main/resources')
+    inputs.file('Dockerfile')
+}

@@ -1,20 +1,20 @@
 apply plugin: 'com.palantir.docker-compose'
 
 dependencies {
-    docker 'registry.redhat.io:rhel7:7.9'
-    docker 'noamasor:ansible-ctrl-noenv-builder:0.0.1'
+    docker project(':ansible-ctrl')
 }
 
 dockerCompose {
+    template 'docker-compose.yml.template'
     dockerComposeFile 'build/docker-compose.yml'
 }
 
 
-task generateDockerComposeFile(type: Copy) {
-    from './'
-    include 'docker-compose.yml.template'
-    filter(ReplaceTokens, tokens: [volume : "${buildDir}:/tmp/conda/out".toString(),
-                                   dockerImageName : dockerImageName('noamasor')])
-    rename ~/(.*).template/, '$1'
-    into 'build'
-}
+// task generateDockerComposeFile(type: Copy) {
+//     from './'
+//     include 'docker-compose.yml.template'
+//     filter(ReplaceTokens, tokens: [volume : "${buildDir}:/tmp/conda/out".toString(),
+//                                    dockerImageName : dockerImageName('noamasor')])
+//     rename ~/(.*).template/, '$1'
+//     into 'build'
+// }

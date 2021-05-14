@@ -1,30 +1,77 @@
 version: '3.7'
 services:
   ansible:
-    image: noamasor/ansible-ctrl-noenv-builder:{{noamasor:ansible-ctrl-noenv-builder}}
-    container_name: ansible-container
-    networks:
-      static-network:
-        ipv4_address: 172.20.0.1
-  host01:
-    image: 'registry.redhat.io/rhel7:{{registry.redhat.io:rhel7}}'
-    container_name: ansible-container
+    image: noamasor/ansible-ctrl-noenv-builder:0.0.1
+    container_name: ansible-controller
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    hostname: ansible-ctrl
+    domainname: cd.prokod.github.com
     networks:
       static-network:
         ipv4_address: 172.20.0.2
-  host02:
-    image: 'registry.redhat.io/rhel7:{{registry.redhat.io:rhel7}}'
-    container_name: ansible-container
+    deploy:
+      resources:
+        limits:
+          cpus: 0.50
+          memory: 512M
+        reservations:
+          cpus: 0.25
+          memory: 128M
+  host01:
+    image: 'registry.access.redhat.com/ubi7/ubi:7.9'
+    container_name: cd-host1
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    hostname: host1
+    domainname: cd.prokod.github.com
     networks:
       static-network:
         ipv4_address: 172.20.0.3
-  host03:
-    image: 'registry.redhat.io/rhel7:{{registry.redhat.io:rhel7}}'
-    container_name: ansible-container
+    deploy:
+      resources:
+        limits:
+          cpus: 1
+          memory: 3584M
+        reservations:
+          cpus: 0.75
+          memory: 3072M
+  host02:
+    image: 'registry.access.redhat.com/ubi7/ubi:7.9'
+    container_name: cd-host2
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    hostname: host2
+    domainname: cd.prokod.github.com
     networks:
       static-network:
         ipv4_address: 172.20.0.4
-
+    deploy:
+      resources:
+        limits:
+          cpus: 1
+          memory: 3584M
+        reservations:
+          cpus: 0.75
+          memory: 3072M
+  host03:
+    image: 'registry.access.redhat.com/ubi7/ubi:7.9'
+    container_name: cd-host3
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    hostname: host3
+    domainname: cd.prokod.github.com
+    networks:
+      static-network:
+        ipv4_address: 172.20.0.5
+    deploy:
+      resources:
+        limits:
+          cpus: 1
+          memory: 3584M
+        reservations:
+          cpus: 0.75
+          memory: 3072M
 networks:
   static-network:
     ipam:

@@ -70,17 +70,7 @@ dockerRun {
     env 'IMG_VERSION': "${project.version}"
 }
 
-// def condaPack = tasks.register('condaPack') {
-//     dependsOn 'dockerRun'
-//     inputs.dir('src/main/resources')
-//     inputs.file('Dockerfile')
-//     outputs.dir("${buildDir}/${condaEnvName()}-${project.version}.tar.gz")
-// }
-
 tasks.dockerRun.configure {
-    // onlyIf {
-    //     !file("${buildDir}/dist/${condaEnvName()}-${project.version}.tar.gz").exists() }
-
     inputs.dir('src/main/resources')
     inputs.file('Dockerfile')
     outputs.dir("${buildDir}/dist")
