@@ -1,4 +1,4 @@
-FROM registry.access.redhat.com/ubi7/ubi:7.9
+FROM registry.access.redhat.com/ubi7/ubi:7.9 AS build
 
 USER root
 # Without this COPY ... $HOME/...  will not work
@@ -17,18 +17,31 @@ ARG CONDA_ENV_NAME
 
 ARG VERSION
 
-RUN mkdir -p /opt/conda/packs
+RUN mkdir -p $BUILD_DIR/out
+VOLUME $BUILD_DIR/out
 
-RUN mkdir -p /opt/conda/ansible
+# Add userr ansible
+RUN adduser ansible
 
-WORKDIR /opt/conda
+# Generate ssh key for user ansible
+RUN yum -y install openssh
+USER ansible
+ENV HOME /home/ansible
+COPY --chown=ansible:ansible ${DEPENDENCIES_DIR}/gen_sshkey.sh $HOME/.local/bin/
+RUN chmod a+x $HOME/.local/bin/gen_sshkey.sh
+WORKDIR $HOME
+RUN $HOME/.local/bin/gen_sshkey.sh
 
-COPY ${DEPENDENCIES_DIR}/${CONDA_ENV_NAME}-${VERSION}.tar.gz /opt/conda/packs
+RUN mkdir -p $HOME/.conda/packs
+RUN mkdir -p $HOME/.conda/ansible
+WORKDIR $HOME/.conda
 
-RUN tar -zxf /opt/conda/packs/${CONDA_ENV_NAME}-${VERSION}.tar.gz -C ansible
+COPY --chown=ansible:ansible ${DEPENDENCIES_DIR}/${CONDA_ENV_NAME}-${VERSION}.tar.gz ./packs
+
+RUN tar -zxf ./packs/${CONDA_ENV_NAME}-${VERSION}.tar.gz -C ansible
 
 RUN mkdir -p $HOME/.local/bin
-COPY ${DEPENDENCIES_DIR}/dounpack.sh $HOME/.local/bin/
+COPY --chown=ansible:ansible ${DEPENDENCIES_DIR}/dounpack.sh $HOME/.local/bin/
 RUN chmod a+x $HOME/.local/bin/dounpack.sh
 
 RUN echo 'source $HOME/.local/bin/dounpack.sh' > ~/.bashrc

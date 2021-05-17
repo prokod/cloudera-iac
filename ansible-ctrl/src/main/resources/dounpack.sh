@@ -2,7 +2,7 @@
 
 do_unpack()
 {
-    cd /opt/conda/
+    cd $HOME/.conda
     source ansible/bin/activate
     conda-unpack
 }

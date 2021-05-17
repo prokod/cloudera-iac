@@ -1,0 +1,36 @@
+[scm_server]
+host1.cd.prokod.github.com
+
+[db_server]
+host1.cd.prokod.github.com
+
+[krb5_server]
+
+[utility_servers]
+host1.cd.prokod.github.com
+
+[utility_servers:children]
+#scm_server
+#db_server
+#krb5_server
+
+[edge_servers]
+#host4.example.com        host_template=HostTemplate-Edge role_ref_names=HDFS-HTTPFS-1
+
+[master_servers]
+host2.cd.prokod.github.com        host_template=HostTemplate-Master1
+#host3.cd.prokod.github.com        host_template=HostTemplate-Master2
+#host4.cd.prokod.github.com        host_template=HostTemplate-Master3
+
+[worker_servers]
+host3.cd.prokod.github.com
+host4.cd.prokod.github.com
+
+[worker_servers:vars]
+host_template=HostTemplate-Workers
+
+[cdh_servers:children]
+utility_servers
+edge_servers
+master_servers
+worker_servers

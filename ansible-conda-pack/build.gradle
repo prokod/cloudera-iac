@@ -51,6 +51,11 @@ docker {
     noCache true
 }
 
+tasks.docker.configure {
+    inputs.dir('src/main/resources')
+    inputs.file('Dockerfile')
+}
+
 project.pluginManager.withPlugin('com.palantir.docker-run') {
     if (!file(layout.buildDirectory.dir("dist")).exists()) {
         mkdir layout.buildDirectory.dir("dist")
@@ -75,3 +80,5 @@ tasks.dockerRun.configure {
     inputs.file('Dockerfile')
     outputs.dir("${buildDir}/dist")
 }
+
+tasks.dockerRun.dependsOn tasks.docker
