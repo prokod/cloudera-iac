@@ -26,6 +26,12 @@ def currentUser() {
     System.getenv("USER")
 }
 
+project.pluginManager.withPlugin('com.palantir.docker') {
+    if (!file(layout.buildDirectory.dir("dist")).exists()) {
+        mkdir layout.buildDirectory.dir("dist")
+    }
+}
+
 docker {
     def dependenciesDir = 'image-dependencies'
 
@@ -51,9 +57,16 @@ docker {
     noCache true
 }
 
+tasks.named('docker') {
+    doLast {
+        ant.touch(file:"${buildDir}/dist/.image_created")
+    }
+}
+
 tasks.docker.configure {
     inputs.dir('src/main/resources')
     inputs.file('Dockerfile')
+    outputs.file(layout.buildDirectory.dir("dist/.image_created"))
 }
 
 project.pluginManager.withPlugin('com.palantir.docker-run') {

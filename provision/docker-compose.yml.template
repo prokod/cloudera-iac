@@ -19,7 +19,7 @@ services:
           cpus: 0.25
           memory: 128M
   host01:
-    image: 'registry.access.redhat.com/ubi7/ubi:7.9'
+    image: 'noamasor/ansible-managed-noenv-builder:0.0.1'
     container_name: cd-host1
     stdin_open: true # docker run -i
     tty: true        # docker run -t
@@ -37,7 +37,7 @@ services:
           cpus: 0.75
           memory: 3072M
   host02:
-    image: 'registry.access.redhat.com/ubi7/ubi:7.9'
+    image: 'noamasor/ansible-managed-noenv-builder:0.0.1'
     container_name: cd-host2
     stdin_open: true # docker run -i
     tty: true        # docker run -t
@@ -55,7 +55,7 @@ services:
           cpus: 0.75
           memory: 3072M
   host03:
-    image: 'registry.access.redhat.com/ubi7/ubi:7.9'
+    image: 'noamasor/ansible-managed-noenv-builder:0.0.1'
     container_name: cd-host3
     stdin_open: true # docker run -i
     tty: true        # docker run -t

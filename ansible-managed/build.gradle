@@ -28,7 +28,7 @@ project.pluginManager.withPlugin('com.palantir.docker') {
     }
 }
 
-tasks.docker.dependsOn project(':ansible-conda-pack').tasks.dockerRun
+tasks.docker.dependsOn project(':ansible-ctrl').tasks.dockerRun
 
 docker {
     def dependenciesDir = 'image-dependencies'
@@ -37,7 +37,7 @@ docker {
     // Files to be used while building image bu Dockerfile
     copySpec.with {
         into dependenciesDir
-        from project(':ansible-conda-pack').tasks.dockerRun.outputs.files.singleFile
+        from project(':ansible-ctrl').tasks.dockerRun.outputs.files.singleFile
         from('src/main/resources') {
             filter(ReplaceTokens, tokens: [PROXY_USER : findProperty('artifactoryUser') ?: 'user',
                                            PROXY_PASS : findProperty('artifactoryPass') ?: 'pass',
@@ -52,7 +52,6 @@ docker {
                PROXY_USER : findProperty('artifactoryUser') ?: 'user',
                PROXY_PASS : findProperty('artifactoryPass') ?: 'pass'
     ])
-
 
     noCache true
 }
@@ -69,33 +68,6 @@ tasks.docker.configure {
     outputs.file(layout.buildDirectory.dir("docker-state/.image_created"))
 }
 
-project.pluginManager.withPlugin('com.palantir.docker-run') {
-    if (!file(layout.buildDirectory.dir("generated")).exists()) {
-        mkdir layout.buildDirectory.dir("generated")
-    }
-}
-
-apply plugin: 'com.palantir.docker-run'
-
-dockerRun {
-    name "${dockerContainerName()}"
-    image "${dockerImageName('noamasor')}"
-    volumes "${buildDir}/generated": '/tmp/generated/out'
-    daemonize false
-    command '/bin/bash', '-c', 'cat /home/ansible/.ssh/id_rsa.pub > /tmp/generated/out/id_rsa.pub'
-    // plugin v0.26.0 arguments feature has bug
-    arguments "--user=0"
-    //env 'IMG_VERSION': "${project.version}"
-}
-
-tasks.dockerRun.configure {
-    inputs.dir('src/main/resources')
-    inputs.file('Dockerfile')
-    outputs.dir("${buildDir}/generated")
-}
-
-tasks.dockerRun.dependsOn tasks.docker
-
 def prepare = tasks.register('prepare') {
-    dependsOn tasks.dockerRun
+    dependsOn tasks.docker
 }

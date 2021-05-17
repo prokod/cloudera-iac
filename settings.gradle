@@ -1,3 +1,4 @@
 include 'ansible-conda-pack'
 include 'ansible-ctrl'
+include 'ansible-managed'
 include 'provision'

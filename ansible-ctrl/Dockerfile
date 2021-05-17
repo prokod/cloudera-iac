@@ -1,4 +1,4 @@
-FROM registry.access.redhat.com/ubi7/ubi:7.9 AS build
+FROM registry.access.redhat.com/ubi7/ubi:7.9 AS ansiblectrlgeneric
 
 USER root
 # Without this COPY ... $HOME/...  will not work
@@ -20,11 +20,12 @@ ARG VERSION
 RUN mkdir -p $BUILD_DIR/out
 VOLUME $BUILD_DIR/out
 
-# Add userr ansible
-RUN adduser ansible
+# Add user ansible
+RUN groupadd --gid 4001 ansible
+RUN adduser --uid 4001 --gid 4001 ansible
 
 # Generate ssh key for user ansible
-RUN yum -y install openssh
+RUN yum -y install openssh git net-tools iputils
 USER ansible
 ENV HOME /home/ansible
 COPY --chown=ansible:ansible ${DEPENDENCIES_DIR}/gen_sshkey.sh $HOME/.local/bin/
@@ -44,4 +45,13 @@ RUN mkdir -p $HOME/.local/bin
 COPY --chown=ansible:ansible ${DEPENDENCIES_DIR}/dounpack.sh $HOME/.local/bin/
 RUN chmod a+x $HOME/.local/bin/dounpack.sh
 
-RUN echo 'source $HOME/.local/bin/dounpack.sh' > ~/.bashrc
+RUN echo 'source $HOME/.local/bin/dounpack.sh' > $HOME/.bashrc
+
+FROM ansiblectrlgeneric AS ansiblectrlclouderacdh
+
+COPY --chown=ansible:ansible ${DEPENDENCIES_DIR}/cloudera-playbook/ansible.cfg $HOME/.ansible.cfg
+COPY --chown=ansible:ansible ${DEPENDENCIES_DIR}/cloudera-playbook/ansible_hosts $HOME/ansible_hosts
+
+RUN mkdir -p $HOME/git
+WORKDIR $HOME/git
+RUN git clone https://github.com/cloudera/cloudera-playbook.git
