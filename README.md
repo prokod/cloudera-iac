@@ -53,3 +53,55 @@ This Gradle module uses Docker Compose to spin up VMs to be later used for Cloud
   ```sh
   ./gradlew provision:dockerComposeDown
   ```
+
+- Running playbook
+
+  ```sh
+  ansible-playbook -i ansible_hosts git/cloudera-playbook/site.yml --extra-vars "krb5_kdc_type=none" --skip-tags krb5 --ask-vault-pass
+  ```
+
+  > NOTES:
+  >
+  > - cloudera_archive_authn is encrypted and set in group_vars
+  > - this is applicable for a non secure cluster!
+
+## Extra
+
+### systemd inside Docker container
+
+- Under WSL  
+  In WSL there is no systemd and so /sys/fs/cgroup/systemd is not present.  
+  This location is a dependency for running Docker container with systemd as this directory is shared with host using volume mounting.  
+  In this case systemd dir needs to be created:
+
+  ```sh
+  sudo mkdir /sys/fs/cgroup/systemd/
+  ```
+
+### Useful Ad-Hoc Ansible commands
+
+- useful link: [ansible-ad-hoc-commands](https://www.middlewareinventory.com/blog/ansible-ad-hoc-commands/)
+
+- fact gathering
+
+  ```sh
+  # All facts
+  ansible -i ansible_hosts all -m setup -v --user <user> --key-file <id_rsa_user> > details.out
+  # Filtered view
+  ansible -i ansible_hosts all -m setup -a 'filter=ansible_*_mb' -v --user <user> --key-file <id_rsa_user> > details.out
+  ```
+
+- sudoers rights
+
+  ```sh
+  ansible -i ansible_hosts all -m shell -a "sudo -l" -v --user <user> --key-file <id_rsa_user> > sudo.out
+  ```
+
+- test become root functionality
+
+  ```sh
+  # When sudoers is set no need for sudo password
+  ansible -i ansible_hosts_1 all -m shell -a "cat /etc/passwd" -b -v --user <user> --key-file <id_rsa_user> > become.out
+  # Otherwise
+  ansible -i ansible_hosts_1 all -m shell -a "cat /etc/passwd" -b -K -v --user <user> --key-file <id_rsa_user> > become.out
+  ```
