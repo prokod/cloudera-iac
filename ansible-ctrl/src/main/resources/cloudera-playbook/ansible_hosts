@@ -1,30 +1,38 @@
+[cez]
+
+[build]
+host1.local ansible_host=172.20.0.3
+host2.local ansible_host=172.20.0.4
+host3.local ansible_host=172.20.0.5
+
 [scm_server]
-host1.cd.prokod.github.com
+host1.local
 
 [db_server]
-host1.cd.prokod.github.com
+host1.local
 
 [krb5_server]
+host1.local
 
 [utility_servers]
-host1.cd.prokod.github.com
+host1.local
 
 [utility_servers:children]
-#scm_server
-#db_server
+scm_server
+db_server
 #krb5_server
 
 [edge_servers]
-#host4.example.com        host_template=HostTemplate-Edge role_ref_names=HDFS-HTTPFS-1
+host3.local        host_template=HostTemplate-Edge role_ref_names=HDFS-HTTPFS-1
 
 [master_servers]
-host2.cd.prokod.github.com        host_template=HostTemplate-Master1
+host2.local        host_template=HostTemplate-Master1
 #host3.cd.prokod.github.com        host_template=HostTemplate-Master2
 #host4.cd.prokod.github.com        host_template=HostTemplate-Master3
 
 [worker_servers]
-host3.cd.prokod.github.com
-host4.cd.prokod.github.com
+host1.local
+host3.local
 
 [worker_servers:vars]
 host_template=HostTemplate-Workers

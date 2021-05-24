@@ -17,8 +17,24 @@ ARG CONDA_ENV_NAME
 
 ARG VERSION
 
+ENV container docker
+
+RUN (cd /lib/systemd/system/sysinit.target.wants/; for i in *; do [ $i == systemd-tmpfiles-setup.service ] || rm -f $i; done); \
+find /lib/systemd/system/multi-user.target.wants/ \( -type l -o -type f \) -not -name 'systemd-user-sessions.service' -delete;\
+rm -f /etc/systemd/system/*.wants/*;\
+rm -f /lib/systemd/system/local-fs.target.wants/*; \
+rm -f /lib/systemd/system/sockets.target.wants/*udev*; \
+rm -f /lib/systemd/system/sockets.target.wants/*initctl*; \
+rm -f /lib/systemd/system/basic.target.wants/*;\
+rm -f /lib/systemd/system/anaconda.target.wants/*;
+
+VOLUME [ "/sys/fs/cgroup" ]
+
 # Generate ssh key for user ansible
-RUN yum -y install openssh openssh-server git net-tools iputils
+RUN yum -y install openssh openssh-server git net-tools iputils sudo
+RUN systemctl enable sshd.service
+# Red Hat 7.x ssh fails with error "System is booting up. See pam_nologin(8) \ Authentication Failed." (but system is booted)
+RUN systemctl enable systemd-user-sessions.service
 
 # Copy ansible user public key
 COPY ${DEPENDENCIES_DIR}/id_rsa.pub /tmp/
@@ -28,10 +44,6 @@ RUN chmod a+x $HOME/.local/bin/bootstrap_ansible.sh
 WORKDIR $HOME
 RUN $HOME/.local/bin/bootstrap_ansible.sh
 
-# USER ansible
-# ENV HOME /home/ansible
-# WORKDIR $HOME
-
 RUN /usr/bin/ssh-keygen -A
-ENTRYPOINT ["/usr/sbin/sshd", "-D"]
 
+CMD ["/usr/sbin/init"]
