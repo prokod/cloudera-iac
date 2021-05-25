@@ -4,14 +4,17 @@ all:
       hosts:
         host1.local:
           ansible_host: 172.20.0.3
-          host_template: HostTemplate-Workers
+          host_template: HostTemplate-Utility-Gateway
+          role_ref_names: HDFS-HTTPFS-1
         host2.local:
           ansible_host: 172.20.0.4
-          host_template: HostTemplate-Master1
+          host_template: HostTemplate-Single-Master
         host3.local:
           ansible_host: 172.20.0.5
-          host_template: HostTemplate-Edge
-          role_ref_names: HDFS-HTTPFS-1
+          host_template: HostTemplate-Workers
+        host4.local:
+          ansible_host: 172.20.0.6
+          host_template: HostTemplate-Workers
     cez:
       hosts:
         datalaket1:

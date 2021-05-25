@@ -84,6 +84,27 @@ services:
         reservations:
           cpus: 1
           memory: 2048M
+  host04:
+    image: 'noamasor/ansible-managed-noenv-builder:0.0.1'
+    container_name: ansible_managed_4
+    privileged: true
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    hostname: host4.local
+    #domainname: cd.prokod.github.com
+    networks:
+      cdh_sandbox_net:
+        ipv4_address: 172.20.0.6
+    deploy:
+      resources:
+        limits:
+          cpus: 1.5
+          memory: 2560M
+        reservations:
+          cpus: 1
+          memory: 2048M
 networks:
   cdh_sandbox_net:
     driver: bridge
