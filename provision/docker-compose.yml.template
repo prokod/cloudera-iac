@@ -38,10 +38,10 @@ services:
       resources:
         limits:
           cpus: 2
-          memory: 6584M
+          memory: 8192M
         reservations:
           cpus: 1.5
-          memory: 6104M
+          memory: 7068M
   host02:
     image: 'noamasor/ansible-managed-noenv-builder:0.0.1'
     container_name: ansible_managed_2

@@ -60,8 +60,8 @@ all:
         host2.local: {}
     worker_servers:
       hosts:
-        host1.local: {}
         host3.local: {}
+        host4.local: {}
     db_server:
       hosts:
         host1.local: {}
@@ -80,8 +80,3 @@ all:
         utility_servers:
         worker_servers:
     ungrouped: {}
-
-
-
-
-

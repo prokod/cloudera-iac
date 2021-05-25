@@ -57,7 +57,7 @@ This Gradle module uses Docker Compose to spin up VMs to be later used for Cloud
 - Running playbook
 
   ```sh
-  ansible-playbook -i ansible_hosts git/cloudera-playbook/site.yml --extra-vars "krb5_kdc_type=none" --skip-tags krb5 --ask-vault-pass
+  ansible-playbook -i ansible_hosts.yml git/cloudera-playbook/site.yml --extra-vars "krb5_kdc_type=none" --skip-tags krb5 --ask-vault-pass
   ```
 
   > NOTES:

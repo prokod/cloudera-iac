@@ -54,7 +54,7 @@ RUN echo 'source $HOME/.local/bin/dounpack.sh' > $HOME/.bashrc
 FROM ansiblectrlgeneric AS ansiblectrlclouderacdh
 
 COPY --chown=ansible:ansible ${DEPENDENCIES_DIR}/cloudera-playbook/ansible.cfg $HOME/.ansible.cfg
-COPY --chown=ansible:ansible ${DEPENDENCIES_DIR}/cloudera-playbook/ansible_hosts $HOME/ansible_hosts
+COPY --chown=ansible:ansible ${DEPENDENCIES_DIR}/cloudera-playbook/ansible_hosts.yml $HOME/ansible_hosts.yml
 COPY --chown=ansible:ansible ${DEPENDENCIES_DIR}/cloudera-playbook/private_key.vault $HOME/private_key.vault
 
 RUN mkdir -p $HOME/git
