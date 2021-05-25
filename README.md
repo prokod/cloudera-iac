@@ -42,6 +42,12 @@ This Gradle module uses Docker Compose to spin up VMs to be later used for Cloud
   ./gradlew ansible-ctrl:clean ansible-ctrl:docker ansible-ctrl:dockerRun ansible-ctrl:dockerRemoveContainer
   ```
 
+- building only `:ansible-managed` docker image after `:ansible-ctrl` artifact created already
+
+  ```sh
+  ./gradlew ansible-managed:clean ansible-managed:docker --info
+  ```
+
 - provisioning of VMs using docker-compose uo
 
   ```sh
@@ -64,6 +70,14 @@ This Gradle module uses Docker Compose to spin up VMs to be later used for Cloud
   >
   > - cloudera_archive_authn is encrypted and set in group_vars
   > - this is applicable for a non secure cluster!
+
+### ansible-vault
+
+- creating encrypted variable string value
+
+  ```sh
+  ansible-vault encrypt_string --vault-id dev@prompt 'foobar' --name 'variable_name'
+  ```
 
 ## Extra
 
