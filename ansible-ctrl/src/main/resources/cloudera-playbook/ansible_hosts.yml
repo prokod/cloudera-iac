@@ -79,4 +79,7 @@ all:
         master_servers:
         utility_servers:
         worker_servers:
+    custom_repo:
+      hosts:
+        host1.local: {}
     ungrouped: {}

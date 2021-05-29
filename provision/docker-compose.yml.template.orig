@@ -1,0 +1,116 @@
+version: '3.7'
+services:
+  ansible:
+    image: noamasor/ansible-ctrl-noenv-builder:0.0.1
+    container_name: ansible_ctrl
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    hostname: ansible_ctrl.local
+    #domainname: cd.prokod.github.com
+    networks:
+      cdh_sandbox_net:
+        ipv4_address: 172.20.0.2
+    deploy:
+      resources:
+        limits:
+          cpus: 0.50
+          memory: 512M
+        reservations:
+          cpus: 0.25
+          memory: 128M
+  host01:
+    image: 'noamasor/ansible-managed-noenv-builder:0.0.1'
+    container_name: ansible_managed_1
+    ports:
+      - "7180:7180"
+      - "8888:8888"
+    privileged: true
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - /mnt/e/docker-volumes/parcel-repo:/opt/cloudera/parcel-repo
+    hostname: host1.local
+    #domainname: cd.prokod.github.com
+    networks:
+      cdh_sandbox_net:
+        ipv4_address: 172.20.0.3
+    deploy:
+      resources:
+        limits:
+          cpus: 2.5
+          memory: 8192M
+        reservations:
+          cpus: 2
+          memory: 7068M
+  host02:
+    image: 'noamasor/ansible-managed-noenv-builder:0.0.1'
+    container_name: ansible_managed_2
+    privileged: true
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    hostname: host2.local
+    #domainname: cd.prokod.github.com
+    networks:
+      cdh_sandbox_net:
+        ipv4_address: 172.20.0.4
+    deploy:
+      resources:
+        limits:
+          cpus: 2
+          memory: 3072M
+        reservations:
+          cpus: 1.5
+          memory: 2560M
+  host03:
+    image: 'noamasor/ansible-managed-noenv-builder:0.0.1'
+    container_name: ansible_managed_3
+    privileged: true
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    hostname: host3.local
+    #domainname: cd.prokod.github.com
+    networks:
+      cdh_sandbox_net:
+        ipv4_address: 172.20.0.5
+    deploy:
+      resources:
+        limits:
+          cpus: 1.5
+          memory: 2048M
+        reservations:
+          cpus: 1
+          memory: 1768M
+  host04:
+    image: 'noamasor/ansible-managed-noenv-builder:0.0.1'
+    container_name: ansible_managed_4
+    privileged: true
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    hostname: host4.local
+    #domainname: cd.prokod.github.com
+    networks:
+      cdh_sandbox_net:
+        ipv4_address: 172.20.0.6
+    deploy:
+      resources:
+        limits:
+          cpus: 1.5
+          memory: 2048M
+        reservations:
+          cpus: 1
+          memory: 1768M
+networks:
+  cdh_sandbox_net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.0.0/25
+          gateway: 172.20.0.1

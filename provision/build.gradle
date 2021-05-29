@@ -4,17 +4,18 @@ dependencies {
     docker project(':ansible-ctrl')
 }
 
-dockerCompose {
-    template 'docker-compose.yml.template'
-    dockerComposeFile 'build/docker-compose.yml'
+task generateDockerComposeTemplateFile(type: Copy) {
+    into layout.buildDirectory.dir("generated/docker-compose.yml.template")
+    from('src/resources/sandbox/docker-compose/') {
+        include 'docker-compose.yml.template'
+        filter(ReplaceTokens, tokens: [parcelRepoDir : '/mnt/e/docker-volumes/parcel-repo',
+                                       httpdRootDir: '/mnt/e/docker-volumes/html' ])
+    }
 }
 
+dockerCompose {
+    template layout.buildDirectory.dir("generated/docker-compose.yml.template")
+    dockerComposeFile layout.buildDirectory.dir("generated/docker-compose.yml")
+}
 
-// task generateDockerComposeFile(type: Copy) {
-//     from './'
-//     include 'docker-compose.yml.template'
-//     filter(ReplaceTokens, tokens: [volume : "${buildDir}:/tmp/conda/out".toString(),
-//                                    dockerImageName : dockerImageName('noamasor')])
-//     rename ~/(.*).template/, '$1'
-//     into 'build'
-// }
+tasks.dockerCompose.dependsOn tasks.generateDockerComposeTemplateFile

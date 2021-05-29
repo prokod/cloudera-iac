@@ -24,52 +24,125 @@ This Gradle module uses Docker Compose to spin up VMs to be later used for Cloud
 
 ## usage
 
-- building docker images (`:ansible-conda-pack`, `:ansible-ctrl`)
+### sandbox scenraio
+
+1. building docker images
+   1. build from scratch control image (`:ansible-conda-pack`, `:ansible-ctrl`)
   
-  ```sh
-  ./gradlew clean prepare
-  ```
+      ```sh
+      ./gradlew clean prepare
+      ```
 
-- building only `:ansible-conda-pack` docker image and exporting intermidiate artifact
+   1. Alternatively
+      1. building first `:ansible-conda-pack` docker image and exporting intermidiate artifact
 
-  ```sh
-  ./gradlew ansible-conda-pack:clean ansible-conda-pack:docker ansible-conda-pack:dockerRun ansible-conda-pack:dockerRemoveContainer
-  ```
+         ```sh
+         ./gradlew ansible-conda-pack:clean ansible-conda-pack:docker ansible-conda-pack:dockerRun
+         # If you wouldlike to remove container in the end (not recommended currently as gradle cannot keep state correctly 
+         # without container exsistance)
+         ./gradlew ansible-conda-pack:clean ansible-conda-pack:docker ansible-conda-pack:dockerRun ansible-conda-pack:dockerRemoveContainer
+         ```
 
-- building only `:ansible-ctrl` docker image after `:ansible-conda-pack` artifact created already
+      1. and then building `:ansible-ctrl` docker image after `:ansible-conda-pack` artifact created already
 
-  ```sh
-  ./gradlew ansible-ctrl:clean ansible-ctrl:docker ansible-ctrl:dockerRun ansible-ctrl:dockerRemoveContainer
-  ```
+         ```sh
+         ./gradlew ansible-ctrl:clean ansible-ctrl:docker ansible-ctrl:dockerRun
+         # If you wouldlike to remove container in the end (not recommended currently as gradle cannot keep state correctly 
+         # without container exsistance)
+         ./gradlew ansible-ctrl:clean ansible-ctrl:docker ansible-ctrl:dockerRun ansible-ctrl:dockerRemoveContainer
+         ```
 
-- building only `:ansible-managed` docker image after `:ansible-ctrl` artifact created already
+   1. building `:ansible-managed` docker image after `:ansible-ctrl` artifact created already
 
-  ```sh
-  ./gradlew ansible-managed:clean ansible-managed:docker --info
-  ```
+      ```sh
+      ./gradlew ansible-managed:clean ansible-managed:docker --info
+      ```
 
-- provisioning of VMs using docker-compose uo
+1. provisioning of VMs using docker-compose uo
 
-  ```sh
-  ./gradlew provision:generateDockerCompose provision:dockerComposeUp
-  ```
+   ```sh
+   ./gradlew provision:generateDockerCompose provision:dockerComposeUp
+   ```
 
-- unprovision VMs using docker-compose down
+1. Running playbook
 
-  ```sh
-  ./gradlew provision:dockerComposeDown
-  ```
+   1. Attach shell to ansible-ctrl container in compose project `build`
 
-- Running playbook
+   1. Run playbook
 
-  ```sh
-  ansible-playbook -i ansible_hosts.yml git/cloudera-playbook/site.yml --extra-vars "krb5_kdc_type=none" --skip-tags krb5 --ask-vault-pass
-  ```
+      ```sh
+      cd ~
+      ansible-playbook -i ansible_hosts.yml git/cloudera-playbook/site.yml --extra-vars "krb5_kdc_type=none" --skip-tags krb5 --ask-vault-pass
+      ```
 
-  > NOTES:
-  >
-  > - cloudera_archive_authn is encrypted and set in group_vars
-  > - this is applicable for a non secure cluster!
+      > NOTES:
+      >
+      > - cloudera_archive_authn is encrypted and set in group_vars
+      > - this is applicable for a non secure cluster!
+
+1. unprovision VMs using docker-compose down
+
+   ```sh
+   ./gradlew provision:dockerComposeDown
+   ```
+
+### private cloud/bare metal scenraio
+
+1. building docker images
+   1. build from scratch control image (`:ansible-conda-pack`, `:ansible-ctrl`)
+  
+      ```sh
+      ./gradlew clean prepare
+      ```
+
+   1. Alternatively
+      1. building first `:ansible-conda-pack` docker image and exporting intermidiate artifact
+
+         ```sh
+         ./gradlew ansible-conda-pack:clean ansible-conda-pack:docker ansible-conda-pack:dockerRun
+         # If you wouldlike to remove container in the end (not recommended currently as gradle cannot keep state correctly 
+         # without container exsistance)
+         ./gradlew ansible-conda-pack:clean ansible-conda-pack:docker ansible-conda-pack:dockerRun ansible-conda-pack:dockerRemoveContainer
+         ```
+
+      1. and then building `:ansible-ctrl` docker image after `:ansible-conda-pack` artifact created already
+
+         ```sh
+         ./gradlew ansible-ctrl:clean ansible-ctrl:docker ansible-ctrl:dockerRun
+         # If you wouldlike to remove container in the end (not recommended currently as gradle cannot keep state correctly 
+         # without container exsistance)
+         ./gradlew ansible-ctrl:clean ansible-ctrl:docker ansible-ctrl:dockerRun ansible-ctrl:dockerRemoveContainer
+         ```
+
+1. provisioning of ansible-ctrl VM using docker-compose uo
+
+   ```sh
+   ./gradlew provision:priv-cloud:generateDockerCompose provision:priv-cloud:dockerComposeUp
+   ```
+
+1. Running playbook
+
+   1. Attach shell to ansible-ctrl container in compose project `build`
+
+   1. Ensure `build` subnet can reach target hosts in priv-cloud
+
+   1. decrypt pk file for ssh communication
+
+      ```sh
+      cd ~
+      .local/bin/decrypt_pk.sh
+      ```
+
+   1. Run playbook
+
+      ```sh
+      cd ~
+      ansible-playbook -i ansible_hosts.yml git/cloudera-playbook/site.yml --extra-vars "krb5_kdc_type=none" --skip-tags krb5 --ask-vault-pass --private-key private_key.txt
+      ```
+
+      > NOTES:
+      >
+      > - this is applicable for a non secure cluster!
 
 ### ansible-vault
 

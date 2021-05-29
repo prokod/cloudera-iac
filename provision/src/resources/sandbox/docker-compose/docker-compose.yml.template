@@ -29,6 +29,9 @@ services:
     tty: true        # docker run -t
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - @parcelRepoDir@:/opt/cloudera/parcel-repo
+      - @httpdRootDir@:/var/www/html
+
     hostname: host1.local
     #domainname: cd.prokod.github.com
     networks:

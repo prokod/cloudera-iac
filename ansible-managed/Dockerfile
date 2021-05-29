@@ -30,6 +30,14 @@ rm -f /lib/systemd/system/anaconda.target.wants/*;
 
 VOLUME [ "/sys/fs/cgroup" ]
 
+# air gapped - parcels preload
+RUN mkdir -p /opt/cloudera/parcel-repo
+VOLUME [ "/opt/cloudera/parcel-repo" ]
+
+# air gapped - tarball based custom_repo for scm packages
+RUN mkdir -p /var/www/html
+VOLUME [ "/var/www/html" ]
+
 # Generate ssh key for user ansible
 RUN yum -y install openssh openssh-server git net-tools iputils sudo
 RUN systemctl enable sshd.service
